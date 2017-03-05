@@ -226,7 +226,7 @@ class YTData(object):
             puts('Dumping JSON into \'%s\'' % output_filepath)
 
         with open(output_filepath, 'w') as file_:
-            json.dump({'items': list(self._items.values())}, file_,
+            json.dump({'items': self.items}, file_,
                       separators=(',', ': '),
                       sort_keys=True,
                       indent=4)
