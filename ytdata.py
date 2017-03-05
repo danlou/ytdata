@@ -257,19 +257,26 @@ class YTData(object):
 
 
 def main():
-    """Usage example."""
+    """Usage example on Python."""
+
+    # instantiate
     cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
                       fields=['videoId', 'title', 'description',
                               'viewCount', 'duration', 'publishedAt'],
                       max_results=128,
                       verbose=True)
 
+    # request and select
+    cnn_data.fetch()
+
+    # peek
     print('Most recent videos:')
     for i, item in enumerate(cnn_data.items[:10]):
         print('  %d. %s' % (i+1, item['title']))
     print()
 
-    cnn_data.dump('cnn__.json')
+    # store
+    cnn_data.dump('cnn.json')
 
 if __name__ == '__main__':
     # TODO: CLI support and usage example
