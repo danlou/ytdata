@@ -202,6 +202,10 @@ class YTData(object):
         :param batch_size: size of batch ids to be sent with each request
         """
         def _request_batch(ids):
+            # pre-process fields parameter, work in progress
+            # fields_ = 'items(%s)' % ','.join([part+'/'+field
+            #                                   for field in relevant_fields])
+
             params = {'key': API_KEY,
                       'part': part,
                       'id': ','.join(ids)}
@@ -261,7 +265,7 @@ def main():
 
     # instantiate
     cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
-                      fields=['videoId', 'title', 'description',
+                      fields=['videoId', 'title', 'categoryId',
                               'viewCount', 'duration', 'publishedAt'],
                       max_results=128,
                       verbose=True)
@@ -280,4 +284,6 @@ def main():
 
 if __name__ == '__main__':
     # TODO: CLI support and usage example
+    # TODO: Look more into API support for field filters (multi-part support?)
+    #       https://developers.google.com/youtube/v3/getting-started#fields
     main()
