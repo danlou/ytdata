@@ -71,7 +71,7 @@ class YTData():
     # TODO
     """
     def __init__(self, channel_id, max_results=1000, verbose=True,
-                 fields=['title', 'videoId'], output='ytdata.json'):
+                 fields=['title', 'videoId']):
 
         self.channel_id = channel_id
         self.verbose = verbose
@@ -89,8 +89,6 @@ class YTData():
             relevant_fields = filter_fields(part, self.fields)
             if len(relevant_fields) > 0:
                 self.add_part(part, relevant_fields)
-
-        self.dump(output)
 
     def get_upload_playlist_id(self):
         """
@@ -233,14 +231,14 @@ class YTData():
                     bar.show(min((i+1)*batch_size, n_videos))
             puts()
 
-    def dump(self, output_filepath):
+    def dump(self, output_filepath='ytdata.json'):
+        """Performs a pretty-printed JSON dump with the available items.
         """
-        # TODO
-        """
-        puts('Dumping JSON into \'%s\'' % output_filepath)
+        if self.verbose:
+            puts('Dumping JSON into \'%s\'' % output_filepath)
 
         with open(output_filepath, 'w') as file_:
-            json.dump({'items': list(self.items.values())}, file_,
+            json.dump({'items': list(self._items.values())}, file_,
                       separators=(',', ': '),
                       sort_keys=True,
                       indent=4)
