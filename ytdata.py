@@ -10,7 +10,7 @@ from clint.textui import puts, progress
 API_URL = 'https://www.googleapis.com/youtube/v3'
 
 try:
-    DEV_KEY = os.environ['GOOGLE_API_KEY']
+    API_KEY = os.environ['GOOGLE_API_KEY']
 except KeyError:
     raise SystemExit('Requires environment variable for your Google API key.\n'
                      'Add \'export GOOGLE_API_KEY="<key>"\' to ~/.bashrc.')
@@ -96,7 +96,7 @@ class YTData():
         """
         # TODO
         """
-        params = {'key': DEV_KEY,
+        params = {'key': API_KEY,
                   'part': 'contentDetails',
                   'id': self.channel_id}
 
@@ -120,7 +120,7 @@ class YTData():
             """
             # TODO
             """
-            params = {'key': DEV_KEY,
+            params = {'key': API_KEY,
                       'part': 'snippet',
                       'playlistId': self.upload_playlist_id,
                       'maxResults': min(50, max_results-len(self.items))}
@@ -195,7 +195,8 @@ class YTData():
             """
             # TODO
             """
-            params = {'key': DEV_KEY,
+        def _request_batch(ids):
+            params = {'key': API_KEY,
                       'part': part,
                       'id': ','.join(ids)}
 
