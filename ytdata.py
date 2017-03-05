@@ -239,12 +239,23 @@ class YTData(object):
         return list(self._items.values())
 
 
+def main():
+    """Usage example."""
+    cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
+                      fields=['videoId', 'title', 'description',
+                              'viewCount', 'duration', 'publishedAt'],
+                      max_results=128,
+                      verbose=True)
+
+    print('Most recent videos:')
+    for i, item in enumerate(cnn_data.items[:10]):
+        print('  %d. %s' % (i+1, item['title']))
+    print()
+
+    cnn_data.dump('cnn__.json')
 
 if __name__ == '__main__':
+    main()
 
-    YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
-           fields=['videoId', 'title', 'description',
-                   'viewCount', 'duration', 'publishedAt'],
-           max_results=127,
-           output='cnn.json',
-           verbose=True)
+
+
