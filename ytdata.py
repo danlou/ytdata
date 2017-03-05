@@ -15,41 +15,27 @@ except KeyError:
     raise SystemExit('Requires environment variable for your Google API key.\n'
                      'Add \'export GOOGLE_API_KEY="<key>"\' to ~/.bashrc.')
 
-# TODO: describe what PARTS is
+# This PARTS dictionary maps part names to their corresponding fields.
+# It's used to set the correct 'part' parameter for requests.
+#
+# For more information about YouTube's API parts and fields visit:
+# https://developers.google.com/youtube/v3/docs/videos
 PARTS = {}
-PARTS['snippet'] = set()
-PARTS['snippet'].add('channelId')
-PARTS['snippet'].add('channelTitle')
-PARTS['snippet'].add('title')
-PARTS['snippet'].add('description')
-PARTS['snippet'].add('position')
-PARTS['snippet'].add('playlistId')
-PARTS['snippet'].add('publishedAt')
-PARTS['snippet'].add('resourceId')
-PARTS['snippet'].add('videoId')
-PARTS['snippet'].add('thumbnails')
 
-PARTS['statistics'] = set()
-PARTS['statistics'].add('commentCount')
-PARTS['statistics'].add('dislikeCount')
-PARTS['statistics'].add('favoriteCount')
-PARTS['statistics'].add('likeCount')
-PARTS['statistics'].add('viewCount')
+PARTS['snippet'] = {'channelId', 'channelTitle', 'title', 'description',
+                    'position', 'playlistId', 'publishedAt', 'resourceId',
+                    'videoId', 'thumbnails'}
 
-PARTS['status'] = set()
-PARTS['status'].add('embeddable')
-PARTS['status'].add('license')
-PARTS['status'].add('privacyStatus')
-PARTS['status'].add('publicStatsViewable')
-PARTS['status'].add('uploadStatus')
+PARTS['statistics'] = {'commentCount', 'dislikeCount', 'favoriteCount',
+                       'likeCount', 'viewCount'}
 
-PARTS['contentDetails'] = set()
-PARTS['contentDetails'].add('caption')
-PARTS['contentDetails'].add('definition')
-PARTS['contentDetails'].add('dimension')
-PARTS['contentDetails'].add('duration')
-PARTS['contentDetails'].add('licensedContent')
-PARTS['contentDetails'].add('projection')
+PARTS['status'] = {'embeddable', 'license', 'privacyStatus', 'uploadStatus',
+                   'publicStatsViewable'}
+
+PARTS['contentDetails'] = {'caption', 'definition', 'dimension', 'duration',
+                           'licensedContent', 'projection'}
+
+# TODO: might still be missing relevant parts, look into this.
 
 
 def filter_fields(part, fields):
