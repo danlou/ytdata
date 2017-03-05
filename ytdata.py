@@ -12,6 +12,7 @@ API_URL = 'https://www.googleapis.com/youtube/v3'
 try:
     API_KEY = os.environ['GOOGLE_API_KEY']
 except KeyError:
+    # TODO: allow API_KEY to be a class argument for YTData()
     raise SystemExit('Requires environment variable for your Google API key.\n'
                      'Add \'export GOOGLE_API_KEY="<key>"\' to ~/.bashrc.')
 
@@ -55,6 +56,11 @@ def chunks(list_, size):
 class YTData(object):
     """
     # TODO
+
+    :param channel_id: the id for the channel to pull videos from.
+    :param max_results: the maximum number of results to be retrieved.
+    :param fields: the fields to be extracted for each video.
+    :param verbose: output mode flag. set True for progress information.
     """
     def __init__(self, channel_id, max_results=99, fields=['title', 'videoId'],
                  verbose=True):
@@ -95,9 +101,7 @@ class YTData(object):
                 self.add_part(part, relevant_fields)
 
     def get_upload_playlist_id(self):
-        """
-        # TODO
-        """
+        """Returns the id for the channel's upload playlist."""
         params = {'key': API_KEY,
                   'part': 'contentDetails',
                   'id': self.channel_id}
@@ -116,7 +120,12 @@ class YTData(object):
 
     def get_snippets(self, snippet_fields):
         """
-        # TODO
+        Requests 'snippets' part for every channel video.
+        Uses 'videos' resource with 'playlistId' set to the uploaded playlist.
+        Results are paginated until items are exhausted or given max_results is
+        reached. Responsible for initializing the video entries in self._items.
+
+        :param snippet_fields: list with fields to keep for the snippets part
         """
         def _request_paginated(page_token=None):
             params = {'key': API_KEY,
@@ -149,15 +158,15 @@ class YTData(object):
             # initialize items entry
             self._items[id_] = {}
 
-            # add specified snippet fields
+            # add relevant (specified) snippet fields
             for field in snippet_fields:
-                if field is 'videoId':
+                if field is 'videoId':  # videoId is nested deeper, exception
                     self._items[id_][field] = id_
                 else:
                     self._items[id_][field] = snippet[field]
 
         if not self.verbose:
-
+            # request results, keep paginating
             n_results, page_token = 0, None
             while n_results < self.max_results:
                 n_results, next_page_token = _request_paginated(page_token)
@@ -168,7 +177,7 @@ class YTData(object):
 
         else:
             # same as above with clint output
-            puts('Request snippet for: %s' % ', '.join(snippet_fields))
+            puts('Request \'snippet\' for: %s' % ', '.join(snippet_fields))
 
             with progress.Bar(expected_size=self.max_results) as bar:
 
@@ -185,7 +194,12 @@ class YTData(object):
 
     def add_part(self, part, relevant_fields, batch_size=32):
         """
-        # TODO
+        Requests given part for every channel video. Must belong to PARTS keys.
+        Adds given fields to respective entries in self._items.
+        Results are requested with batches of video ids for better efficiency.
+
+        :param relevant_fields: list with fields to keep for the given part
+        :param batch_size: size of batch ids to be sent with each request
         """
         def _request_batch(ids):
             params = {'key': API_KEY,
@@ -214,7 +228,7 @@ class YTData(object):
 
         else:
             # same as above with clint output
-            puts('Request %s for: %s' % (part, ', '.join(relevant_fields)))
+            puts('Request \'%s\' for: %s' % (part, ', '.join(relevant_fields)))
 
             with progress.Bar(expected_size=n_videos) as bar:
                 for i, batch in enumerate(batches):
@@ -223,7 +237,7 @@ class YTData(object):
             puts()
 
     def dump(self, output_filepath='ytdata.json'):
-        """Performs a pretty-printed JSON dump with the available items.
+        """Performs a pretty-printed json.dump() with the available items.
         """
         if self.verbose:
             puts('Dumping JSON into \'%s\'' % output_filepath)
@@ -258,7 +272,5 @@ def main():
     cnn_data.dump('cnn__.json')
 
 if __name__ == '__main__':
+    # TODO: CLI support and usage example
     main()
-
-
-
