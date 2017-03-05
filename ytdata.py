@@ -77,7 +77,8 @@ class YTData():
         self.verbose = verbose
         self.fields = set(fields)
 
-        self.items = OrderedDict()
+        #
+        self._items = OrderedDict()
 
         self.upload_playlist_id = self.get_upload_playlist_id()
 
@@ -114,14 +115,11 @@ class YTData():
         """
         # TODO
         """
-        def get_paginated(page_token=None):
-            """
-            # TODO
-            """
+        def _get_paginated(page_token=None):
             params = {'key': API_KEY,
                       'part': 'snippet',
                       'playlistId': self.upload_playlist_id,
-                      'maxResults': min(50, max_results-len(self.items))}
+                      'maxResults': min(50, max_results-len(self._items))}
 
             if page_token is not None:
                 params['pageToken'] = page_token
@@ -130,39 +128,36 @@ class YTData():
 
             if req.status_code == 200:
                 response = req.json()
-                list(map(process_item, response['items']))
+                list(map(_process_item, response['items']))
 
                 # return if we've maxed out available items
-                if response['pageInfo']['totalResults'] == len(self.items):
-                    return len(self.items), None
+                if response['pageInfo']['totalResults'] == len(self._items):
+                    return len(self._items), None
 
-                return len(self.items), response.get('nextPageToken', None)
+                return len(self._items), response.get('nextPageToken', None)
 
             else:
                 logging.warning(req.status_code, req.url)
 
-        def process_item(item):
-            """
-            # TODO
-            """
+        def _process_item(item):
             snippet = item['snippet']
             id_ = snippet['resourceId']['videoId']
 
             # initialize items entry
-            self.items[id_] = {}
+            self._items[id_] = {}
 
             # add specified snippet fields
             for field in snippet_fields:
                 if field is 'videoId':
-                    self.items[id_][field] = id_
+                    self._items[id_][field] = id_
                 else:
-                    self.items[id_][field] = snippet[field]
+                    self._items[id_][field] = snippet[field]
 
         if not self.verbose:
 
             n_results, page_token = 0, None
             while n_results < max_results:
-                n_results, next_page_token = get_paginated(page_token)
+                n_results, next_page_token = _get_paginated(page_token)
                 if next_page_token is None:
                     break
                 else:
@@ -176,7 +171,7 @@ class YTData():
 
                 n_results, page_token = 0, None
                 while n_results < max_results:
-                    n_results, next_page_token = get_paginated(page_token)
+                    n_results, next_page_token = _get_paginated(page_token)
                     if next_page_token is None:
                         break
                     else:
@@ -189,10 +184,6 @@ class YTData():
         """
         # TODO
         """
-        def request_batch(ids):
-            """
-            # TODO
-            """
         def _request_batch(ids):
             params = {'key': API_KEY,
                       'part': part,
@@ -201,25 +192,22 @@ class YTData():
             req = requests.get(API_URL+'/videos', params)
 
             if req.status_code == 200:
-                list(map(process_item, req.json()['items']))
+                list(map(_process_item, req.json()['items']))
 
             else:
                 logging.warning(req.status_code, req.url)
 
-        def process_item(item):
-            """
-            # TODO
-            """
+        def _process_item(item):
             id_ = item['id']
             for field in relevant_fields:
-                self.items[id_][field] = item[part][field]
+                self._items[id_][field] = item[part][field]
 
-        video_ids, n_videos = list(self.items.keys()), len(self.items)
+        video_ids, n_videos = list(self._items.keys()), len(self._items)
         batches = chunks(video_ids, batch_size)
 
         if not self.verbose:
             # adds specified part fields to batches of items
-            list(map(request_batch, batches))
+            list(map(_request_batch, batches))
 
         else:
             # same as above with clint output
@@ -227,7 +215,7 @@ class YTData():
 
             with progress.Bar(expected_size=n_videos) as bar:
                 for i, batch in enumerate(batches):
-                    request_batch(batch)
+                    _request_batch(batch)
                     bar.show(min((i+1)*batch_size, n_videos))
             puts()
 
