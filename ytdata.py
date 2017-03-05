@@ -265,7 +265,7 @@ def main():
 
     # instantiate
     cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
-                      fields=['videoId', 'title', 'categoryId',
+                      fields=['videoId', 'title', 'description',
                               'viewCount', 'duration', 'publishedAt'],
                       max_results=128,
                       verbose=True)
