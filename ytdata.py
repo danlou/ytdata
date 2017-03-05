@@ -56,20 +56,37 @@ class YTData(object):
     """
     # TODO
     """
-    def __init__(self, channel_id, max_results=1000, verbose=True,
-                 fields=['title', 'videoId']):
+    def __init__(self, channel_id, max_results=99, fields=['title', 'videoId'],
+                 verbose=True):
 
         self.channel_id = channel_id
+        self.max_results = max_results
         self.verbose = verbose
-        self.fields = set(fields)
+        self.fields = set(fields)  # cast for set operations (filter_fields())
 
-        #
+        # The self._items dict contains the data extracted for each video.
+        # It's indexed by videoId for easier reference when adding part fields.
+        # It's an OrderedDict() because we want to preserve the ordering from
+        # the API results, which are ordered by publish date by default.
+        # This data should be accessed externally using the items @property.
         self._items = OrderedDict()
 
+        # We'll need to know the playlist id for uploaded videos to request
+        # all videos for the channel.
+        self.upload_playlist_id = None
+
+    def fetch(self):
+        """Performs GET requests to API and extracts relevant fields.
+        Data is aggregated in the self._items dictionary, indexed by videoId.
+        """
         self.upload_playlist_id = self.get_upload_playlist_id()
 
+        # the playlist id is required to proceed, exit if None
+        if self.upload_playlist_id is None:
+            raise SystemExit('Failed to retrieve upload playlist id.')
+
         snippet_fields = filter_fields('snippet', self.fields)
-        self.get_snippets(snippet_fields, max_results)
+        self.get_snippets(snippet_fields)
 
         for part in [part for part in PARTS if part is not 'snippet']:
 
@@ -95,17 +112,17 @@ class YTData(object):
 
         else:
             logging.critical(req.status_code, req.url)
-            raise SystemExit('Failed to retrieve upload playlist id.')
+            return None
 
-    def get_snippets(self, snippet_fields, max_results):
+    def get_snippets(self, snippet_fields):
         """
         # TODO
         """
-        def _get_paginated(page_token=None):
+        def _request_paginated(page_token=None):
             params = {'key': API_KEY,
                       'part': 'snippet',
                       'playlistId': self.upload_playlist_id,
-                      'maxResults': min(50, max_results-len(self._items))}
+                      'maxResults': min(50, self.max_results-len(self._items))}
 
             if page_token is not None:
                 params['pageToken'] = page_token
@@ -114,7 +131,7 @@ class YTData(object):
 
             if req.status_code == 200:
                 response = req.json()
-                list(map(_process_item, response['items']))
+                list(map(_select_fields, response['items']))
 
                 # return if we've maxed out available items
                 if response['pageInfo']['totalResults'] == len(self._items):
@@ -125,7 +142,7 @@ class YTData(object):
             else:
                 logging.warning(req.status_code, req.url)
 
-        def _process_item(item):
+        def _select_fields(item):
             snippet = item['snippet']
             id_ = snippet['resourceId']['videoId']
 
@@ -142,8 +159,8 @@ class YTData(object):
         if not self.verbose:
 
             n_results, page_token = 0, None
-            while n_results < max_results:
-                n_results, next_page_token = _get_paginated(page_token)
+            while n_results < self.max_results:
+                n_results, next_page_token = _request_paginated(page_token)
                 if next_page_token is None:
                     break
                 else:
@@ -153,11 +170,11 @@ class YTData(object):
             # same as above with clint output
             puts('Request snippet for: %s' % ', '.join(snippet_fields))
 
-            with progress.Bar(expected_size=max_results) as bar:
+            with progress.Bar(expected_size=self.max_results) as bar:
 
                 n_results, page_token = 0, None
-                while n_results < max_results:
-                    n_results, next_page_token = _get_paginated(page_token)
+                while n_results < self.max_results:
+                    n_results, next_page_token = _request_paginated(page_token)
                     if next_page_token is None:
                         break
                     else:
@@ -178,12 +195,12 @@ class YTData(object):
             req = requests.get(API_URL+'/videos', params)
 
             if req.status_code == 200:
-                list(map(_process_item, req.json()['items']))
+                list(map(_select_fields, req.json()['items']))
 
             else:
                 logging.warning(req.status_code, req.url)
 
-        def _process_item(item):
+        def _select_fields(item):
             id_ = item['id']
             for field in relevant_fields:
                 self._items[id_][field] = item[part][field]
