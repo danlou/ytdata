@@ -66,7 +66,7 @@ def chunks(list_, size):
         yield list_[i:i+size]
 
 
-class YTData():
+class YTData(object):
     """
     # TODO
     """
@@ -230,6 +230,14 @@ class YTData():
                       separators=(',', ': '),
                       sort_keys=True,
                       indent=4)
+
+    @property
+    def items(self):
+        """Returns a list of dictionaries with fields extracted for each item.
+        List entries are ordered by published date.
+        """
+        return list(self._items.values())
+
 
 
 if __name__ == '__main__':
