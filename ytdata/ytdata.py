@@ -6,6 +6,9 @@ from collections import OrderedDict
 import requests
 from click import echo, progressbar
 
+# TODO: CLI support and usage example
+# TODO: Look more into API support for field filters (multi-part support?)
+#       https://developers.google.com/youtube/v3/getting-started#fields
 
 API_URL = 'https://www.googleapis.com/youtube/v3'
 
@@ -160,7 +163,7 @@ class YTData(object):
 
             # add relevant (specified) snippet fields
             for field in snippet_fields:
-                if field is 'videoId':  # videoId is nested deeper, exception
+                if field == 'videoId':  # videoId is nested deeper, exception
                     self._items[id_][field] = id_
                 else:
                     self._items[id_][field] = snippet[field]
@@ -259,31 +262,3 @@ class YTData(object):
         """
         return list(self._items.values())
 
-
-def main():
-    """Usage example on Python."""
-
-    # instantiate
-    cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
-                      fields=['videoId', 'title', 'description',
-                              'viewCount', 'duration', 'publishedAt'],
-                      max_results=128,
-                      verbose=True)
-
-    # request and select
-    cnn_data.fetch()
-
-    # peek
-    print('Most recent videos:')
-    for i, item in enumerate(cnn_data.items[:10]):
-        print('  %d. %s' % (i+1, item['title']))
-    print()
-
-    # store
-    cnn_data.dump('cnn.json')
-
-if __name__ == '__main__':
-    # TODO: CLI support and usage example
-    # TODO: Look more into API support for field filters (multi-part support?)
-    #       https://developers.google.com/youtube/v3/getting-started#fields
-    main()
