@@ -4,7 +4,7 @@ from ytdata import YTData
 cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
                   fields=['videoId', 'title', 'description',
                           'viewCount', 'duration', 'publishedAt'],
-                  max_results=100000,
+                  max_results=1000,
                   verbose=True)
 
 # request and select
