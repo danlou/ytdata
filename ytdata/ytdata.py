@@ -4,8 +4,11 @@ import logging
 from collections import OrderedDict
 
 import requests
-from clint.textui import puts, progress
+from click import echo, progressbar
 
+# TODO: CLI support and usage example
+# TODO: Look more into API support for field filters (multi-part support?)
+#       https://developers.google.com/youtube/v3/getting-started#fields
 
 API_URL = 'https://www.googleapis.com/youtube/v3'
 
@@ -160,7 +163,7 @@ class YTData(object):
 
             # add relevant (specified) snippet fields
             for field in snippet_fields:
-                if field is 'videoId':  # videoId is nested deeper, exception
+                if field == 'videoId':  # videoId is nested deeper, exception
                     self._items[id_][field] = id_
                 else:
                     self._items[id_][field] = snippet[field]
@@ -176,10 +179,10 @@ class YTData(object):
                     page_token = next_page_token
 
         else:
-            # same as above with clint output
-            puts('Request \'snippet\' for: %s' % ', '.join(snippet_fields))
+            # same as above with click output
+            echo('Request \'snippet\' for: %s' % ', '.join(snippet_fields))
 
-            with progress.Bar(expected_size=self.max_results) as bar:
+            with progressbar(length=self.max_results) as bar:
 
                 n_results, page_token = 0, None
                 while n_results < self.max_results:
@@ -189,8 +192,8 @@ class YTData(object):
                     else:
                         page_token = next_page_token
 
-                    bar.show(n_results)
-            puts()
+                    bar.update(n_results)
+            echo()
 
     def add_part(self, part, relevant_fields, batch_size=32):
         """
@@ -231,20 +234,20 @@ class YTData(object):
             list(map(_request_batch, batches))
 
         else:
-            # same as above with clint output
-            puts('Request \'%s\' for: %s' % (part, ', '.join(relevant_fields)))
+            # same as above with click output
+            echo('Request \'%s\' for: %s' % (part, ', '.join(relevant_fields)))
 
-            with progress.Bar(expected_size=n_videos) as bar:
+            with progressbar(length=n_videos) as bar:
                 for i, batch in enumerate(batches):
                     _request_batch(batch)
-                    bar.show(min((i+1)*batch_size, n_videos))
-            puts()
+                    bar.update(min((i+1)*batch_size, n_videos))
+            echo()
 
     def dump(self, output_filepath='ytdata.json'):
         """Performs a pretty-printed json.dump() with the available items.
         """
         if self.verbose:
-            puts('Dumping JSON into \'%s\'' % output_filepath)
+            echo('Dumping JSON into \'%s\'' % output_filepath)
 
         with open(output_filepath, 'w') as file_:
             json.dump({'items': self.items}, file_,
@@ -259,31 +262,3 @@ class YTData(object):
         """
         return list(self._items.values())
 
-
-def main():
-    """Usage example on Python."""
-
-    # instantiate
-    cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
-                      fields=['videoId', 'title', 'description',
-                              'viewCount', 'duration', 'publishedAt'],
-                      max_results=128,
-                      verbose=True)
-
-    # request and select
-    cnn_data.fetch()
-
-    # peek
-    print('Most recent videos:')
-    for i, item in enumerate(cnn_data.items[:10]):
-        print('  %d. %s' % (i+1, item['title']))
-    print()
-
-    # store
-    cnn_data.dump('cnn.json')
-
-if __name__ == '__main__':
-    # TODO: CLI support and usage example
-    # TODO: Look more into API support for field filters (multi-part support?)
-    #       https://developers.google.com/youtube/v3/getting-started#fields
-    main()
