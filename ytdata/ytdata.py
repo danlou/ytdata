@@ -284,3 +284,9 @@ class YTData(object):
         """
         return list(self._items.values())
 
+    @property
+    def max_length(self):
+        """
+        # TODO: include property for checking the channel's total results.
+        """
+        pass
