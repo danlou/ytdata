@@ -13,7 +13,8 @@ from ytdata import YTData
 @click.argument('fields', nargs=-1, metavar='<fields>')
 def main(channel, max_results, output_file, fields):
     """
-    YouTube Data API for humans.
+    Obtain video details for YouTube channels.
+    Version 0.1.0.
 
     Example:
 

@@ -1,6 +1,8 @@
-# ytdata - YouTube Data API for humans.
+# ytdata - Obtain video details for YouTube channels
 
-ytdata is a minimalistic Python3 library for obtaining metadata for videos via YouTube's Data API (v3). You can import it into your Python projects or use it from the CLI.
+ytdata is a minimalistic Python3 library that allows you to simply specify the channel and video fields that matter to you and let it make the right calls to YouTube's Data API (v3) to obtain that data.
+
+### Why?
 
 YouTube can be an amazing source of data, but it's API isn't the most straightforward. In many cases, you'll need to perform several requests to get a few details on a single video. 
 
@@ -11,7 +13,7 @@ There's no endpoint to simply get all the videos for a given channel and let you
 ```python
 from ytdata import YTData
 
-cnn_data = YTData('UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
+cnn_data = YTData(channel_id='UCupvZG-5ko_eiXAupbDfxWw',  # CNN's YouTube channel
                   fields=['videoId', 'title', 'description',
                           'viewCount', 'duration', 'publishedAt'],
                   max_results=250,

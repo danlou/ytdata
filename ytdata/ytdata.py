@@ -1,3 +1,16 @@
+"""
+    ytdata
+    ~~~~~~
+
+    ytdata is a minimalistic Python3 library that allows you to simply specify
+    the channel and video fields that matter to you and let it make the right
+    calls to YouTube's Data API (v3) to obtain that data.
+
+    Supported fields are those included in the PARTS dictionary below.
+
+    :copyright: (c) 2017 by Daniel Loureiro.
+    :license: MIT, see LICENSE.txt for more details.
+"""
 import os
 import json
 import logging
@@ -6,7 +19,6 @@ from collections import OrderedDict
 import requests
 from click import echo, progressbar
 
-# TODO: CLI support and usage example
 # TODO: Look more into API support for field filters (multi-part support?)
 #       https://developers.google.com/youtube/v3/getting-started#fields
 
@@ -51,19 +63,19 @@ def filter_fields(part, fields):
 
 
 def chunks(list_, size):
-    """ Yield successive n-sized chunks from given list. """
+    """Yield successive n-sized chunks from given list."""
     for i in range(0, len(list_), size):
         yield list_[i:i+size]
 
 
 class YTData(object):
     """
-    # TODO
+    Obtain video details for YouTube channels.
 
     :param channel_id: the id for the channel to pull videos from.
     :param max_results: the maximum number of results to be retrieved.
     :param fields: the fields to be extracted for each video.
-    :param verbose: output mode flag. set True for progress information.
+    :param verbose: output mode flag. Set True for progress information.
     """
     def __init__(self, channel_id, max_results=99, fields=['title', 'videoId'],
                  verbose=True):
@@ -122,20 +134,21 @@ class YTData(object):
             response = req.json()
 
             details = response['items'][0]['contentDetails']
-            return details['relatedPlaylists']['uploads']
+            upload_playlist_id = details['relatedPlaylists']['uploads']
+
+            return upload_playlist_id
 
         else:
             logging.critical(req.status_code, req.url)
             return None
 
     def get_snippets(self, snippet_fields):
-        """
-        Requests 'snippets' part for every channel video.
+        """Requests 'snippets' part for every channel video.
         Uses 'videos' resource with 'playlistId' set to the uploaded playlist.
         Results are paginated until items are exhausted or given max_results is
         reached. Responsible for initializing the video entries in self._items.
 
-        :param snippet_fields: list with fields to keep for the snippets part
+        :param snippet_fields: list with fields to keep for the snippets part.
         """
         def _request_paginated(page_token=None):
             params = {'key': API_KEY,
@@ -203,13 +216,13 @@ class YTData(object):
             echo()
 
     def add_part(self, part, relevant_fields, batch_size=32):
-        """
-        Requests given part for every channel video. Must belong to PARTS keys.
+        """Requests given part for every channel video.
         Adds given fields to respective entries in self._items.
         Results are requested with batches of video ids for better efficiency.
 
-        :param relevant_fields: list with fields to keep for the given part
-        :param batch_size: size of batch ids to be sent with each request
+        :param part: string that specifies the part. Must belong to PARTS keys.
+        :param relevant_fields: list with fields to keep for the given part.
+        :param batch_size: size of batch ids to be sent with each request.
         """
         def _request_batch(ids):
             # pre-process fields parameter, work in progress
@@ -252,6 +265,8 @@ class YTData(object):
 
     def dump(self, output_filepath='ytdata.json'):
         """Performs a pretty-printed json.dump() with the available items.
+
+        :param output_filepath: destination path for the JSON dump.
         """
         if self.verbose:
             echo('Dumping JSON into \'%s\'' % output_filepath)
