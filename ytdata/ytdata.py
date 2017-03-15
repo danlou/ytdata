@@ -84,6 +84,13 @@ class YTData(object):
         # all videos for the channel.
         self.upload_playlist_id = None
 
+        if self.verbose:
+            echo('ytdata v%s' % '0.1.0')  # FIXME: avoid hardcoded
+            echo('  channel: %s' % self.channel_id)
+            echo('  max_results: %d' % self.max_results)
+            echo('  fields: %s' % ', '.join(self.fields))
+            echo()
+
     def fetch(self):
         """Performs GET requests to API and extracts relevant fields.
         Data is aggregated in the self._items dictionary, indexed by videoId.
