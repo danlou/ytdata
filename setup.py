@@ -1,5 +1,5 @@
 """
-YouTube Data API for humans.
+Obtain video details for YouTube channels.
 """
 from setuptools import find_packages, setup
 
@@ -12,7 +12,7 @@ setup(
     license='MIT',
     author='Daniel Loureiro',
     author_email='daniel.b.loureiro@gmail.com',
-    description='YouTube Data API for humans.',
+    description='Obtain video details for YouTube channels.',
     long_description=__doc__,
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
@@ -41,7 +41,7 @@ setup(
         'Operating System :: Unix',
         # 'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
+        # 'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ]
