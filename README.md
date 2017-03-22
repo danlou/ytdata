@@ -50,6 +50,12 @@ After you get your key, you can add the environment variable by opening your ~/.
 export GOOGLE_API_KEY="<Your_Private_Key>"
 ```
 
+### How to find the channel id ?
+
+The simplest way to find the channel id is to visit the YouTube page for a video belonging to the channel of interest and extract the id from the page's meta tags. Just open the console on your browser and enter:
+
+```js
+console.log(document.querySelector('meta[itemprop="channelId"]')['content']);
 ```
 
 ### Fields
