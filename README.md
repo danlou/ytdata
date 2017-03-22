@@ -58,22 +58,22 @@ The simplest way to find the channel id is to visit the YouTube page for a video
 console.log(document.querySelector('meta[itemprop="channelId"]')['content']);
 ```
 
-### Fields
+### Supported Fields
 
-You can request several fields to be returned with each video result. Here are the fields currently supported.
+You can request several fields to be returned with each video result.
 
 | FIELD | EXAMPLE |
 | ------ | ------ |
 | channelId | "UCAuUUnT6oDeKwE6v1NGQxug" |
 | channelTitle | "TED" |
-| title | "I grew up in the Westboro Baptist Church. Here's why I left | Megan Phelps-Roper" |
+| title | "I grew up in the Westboro Baptist Church. Here's why I left Megan Phelps-Roper" |
 | description | "What's it like to grow up within a group of people who exult in demonizing ..." |
 | position | 0 |
 | publishedAt | "2017-03-06T17:10:02.000Z" |
 | videoId | "bVV2Zk88beY" |
 | viewCount | "871757" |
 | favoriteCount | "0" |
-| commentCount | TODO |
+| commentCount | "52" |
 | likeCount | "2408" |
 | dislikeCount | "229" |
 | embeddable | true |
