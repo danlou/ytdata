@@ -34,9 +34,14 @@ cnn_data.dump('cnn.json')
 
 TODO
 
-### Setup
+### Installation notes
 
-ytdata expects a valid Google API Key stored in an environment variable called GOOGLE_API_KEY.
+ytdata is available as a pip package and can be installed with:
+```sh
+$ pip install ytdata
+```
+
+It expects a valid Google API Key stored in an environment variable called GOOGLE_API_KEY.
 If you don't already have one, you can follow these instructions (you'll want a server key):
 https://developers.google.com/youtube/registering_an_application#Create_API_Keys
 
@@ -45,9 +50,6 @@ After you get your key, you can add the environment variable by opening your ~/.
 export GOOGLE_API_KEY="<Your_Private_Key>"
 ```
 
-Then, install dependencies with:
-```sh
-$ pip install -r requirements.txt
 ```
 
 ### Fields
