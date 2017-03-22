@@ -24,15 +24,15 @@ cnn_data.fetch()
 print('Most recent videos:')
 for i, item in enumerate(cnn_data.items[:10]):
     print('  %d. %s' % (i+1, item['title']))
-print()
 
 # store
 cnn_data.dump('cnn.json')
 ```
 
-### CLI Example
+### Setup and CLI Demonstration
 
-TODO
+[<img src="https://i.ytimg.com/vi/RAT3J-tBb10/maxresdefault.jpg">](https://www.youtube.com/watch?v=RAT3J-tBb10)
+[YouTube link](https://www.youtube.com/watch?v=RAT3J-tBb10)
 
 ### Installation notes
 
